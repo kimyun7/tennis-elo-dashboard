@@ -6,15 +6,15 @@ INITIAL_RATING = 1000
 
 # Google Sheets info for reading input data
 GSHEETS_CREDENTIALS_FILE = "./google-credentials.json"
-SPREADSHEET_ID = "1TLwecYYVwlbOtd8Fxq6beMbbkdPrWKuyk3w01CdqBoI"
+SPREADSHEET_ID = "1Br1vSCiPPp8wQ881AiMUAHFZQcIoAPZLVcyqfzwhxps"
 DATA_SHEET_ID = 0
 DUMMY_PLAYER_NAME = "_Sub_"
 
 # dashboard settings
 DBC_THEME = "FLATLY"  # others I liked: DARKLY, SIMPLEX, LUMEN (https://bootswatch.com/flatly/)
 PLOTLY_THEME = "plotly_white"
-LOGO_PATH = "/assets/columbus.jpg"
+LOGO_PATH = "/assets/tennis.jpg"
 GITHUB_LOGO_PATH = "assets/GitHub-Mark-32px.png"
-GITHUB_URL = "https://github.com/Balavignesh/badminton-elo-dashboard"
-TITLE = "Columbus Badminton Club - Woodward"
-SUBTITLE = "Home of Master Shuttlers"
+GITHUB_URL = "https://github.com/kimyun7/tennis-elo-dashboard"
+TITLE = "Aoullim Tennis"
+SUBTITLE = "Elo Leaderboard"
