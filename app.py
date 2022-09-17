@@ -52,7 +52,7 @@ def header():
 def footer():
     return html.Div([
         html.Hr(),
-        html.Small("Columbus Badminton Club :)",
+        html.Small("Aoullim Tennis Club",
                    className="text-muted font-italic"),
         html.Hr(),
     ])
