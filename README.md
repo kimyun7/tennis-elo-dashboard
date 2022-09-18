@@ -1,4 +1,4 @@
-# Badminton Doubles Elo Dashboard
+# Tennis Doubles Elo Dashboard
 
 A generalized version of Elo to track the results of our friendly tennis doubles games.
 
