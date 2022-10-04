@@ -34,7 +34,7 @@ app.config["suppress_callback_exceptions"] = True
 # Get data
 match_data = utils.load_match_data_from_gsheet()
 player_df = utils.load_player_data_from_gsheet()
-    
+
 app.layout = html.Div(
     children=[
         html.Div(
@@ -126,8 +126,9 @@ app.layout = html.Div(
     [Input("match-type-filter", "value"),
         Input("event-type-filter", "value"),])
 def get_rating_chart(match_type, event):
-    # total_time = get_current_time()
-    # df = get_wind_data(total_time - 200, total_time)
+    # Get updated data on callback
+    match_data = utils.load_match_data_from_gsheet()
+    player_df = utils.load_player_data_from_gsheet()
     players = [Player(player_id=x, rating=float(y)) for x,y in zip(player_df.player_id, player_df.initial_elo)]
     data = utils.prep_results_history_for_dash(match_data, event=event, match_type=match_type)
     data = data[['date','winners', 'losers']]
