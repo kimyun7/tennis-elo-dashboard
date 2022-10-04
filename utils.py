@@ -22,13 +22,22 @@ def get_dash_theme(style: str) -> List[str]:
     except AttributeError:
         raise AttributeError(f"could not find theme named '{style}'")
 
-def load_data_from_gsheet() -> pd.DataFrame:
+def load_match_data_from_gsheet() -> pd.DataFrame:
     gc = gspread.service_account(filename=config.GSHEETS_CREDENTIALS_FILE)
     spreadsheet = gc.open_by_key(config.SPREADSHEET_ID)
     data_sheet = get_worksheet_by_id(spreadsheet, config.DATA_SHEET_ID)
     df = worksheet_to_dataframe(data_sheet)
+    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")
+    # df.rename(columns={'date':'Date'}, inplace=True)
+    df.sort_values("date", inplace=True)
     return df
 
+def load_player_data_from_gsheet():
+    gc = gspread.service_account(filename=config.GSHEETS_CREDENTIALS_FILE)
+    spreadsheet = gc.open_by_key(config.SPREADSHEET_ID)
+    data_sheet = get_worksheet_by_id(spreadsheet, config.PLAYER_SHEET_ID)
+    df = worksheet_to_dataframe(data_sheet)
+    return df
 
 def get_worksheet_by_id(spreadsheet: Spreadsheet, worksheet_id: str) -> Worksheet:
     try:
@@ -68,11 +77,44 @@ def get_dash_theme(style: str) -> List[str]:
 
 
 def prep_results_history_for_dash(
-        data: pd.DataFrame,
-) -> pd.DataFrame:
+        data: pd.DataFrame, match_type=None, event=None) -> pd.DataFrame:
+    
     results_history = data.copy()
     results_history = results_history.dropna(how="all", axis=1)  # drop columns if all NaN
-    results_history = results_history.rename(columns={"date": "Date"})
+    results_history = results_history.rename(columns={"date": "date"})
+    
+        
+    if event and event != 'All':
+        results_history = results_history[results_history.event == event]
+    if match_type:
+        results_history = results_history[results_history.match_type == match_type]
+    
+    if not len(results_history):
+        return pd.DataFrame(columns=['date','winners','losers'])
+    
+    results_history['score_team_1'] = results_history['score_team_1'].astype(int)
+    results_history['score_team_2'] = results_history['score_team_2'].astype(int)
+    results_history['winning_team'] = results_history[['score_team_1','score_team_2']].idxmax(axis=1)
+    
+    if match_type == 'D':
+        results_history['losers'] = results_history.apply(
+                lambda x: (x['team_1_1'], x['team_1_2']) 
+                if x['winning_team'] != 'score_team_1' 
+                else (x['team_2_1'], x['team_2_2']), axis=1)
+        results_history['winners'] = results_history.apply(
+                lambda x: (x['team_1_1'], x['team_1_2']) 
+                if x['winning_team'] == 'score_team_1' 
+                else (x['team_2_1'], x['team_2_2']), axis=1)
+    else:
+        results_history['losers'] = results_history.apply(
+                lambda x: (x['team_1_1'])
+                if x['winning_team'] != 'score_team_1' 
+                else x['team_2_1'], axis=1)
+        results_history['winners'] = results_history.apply(
+                lambda x: (x['team_1_1'])
+                if x['winning_team'] == 'score_team_1' 
+                else x['team_2_1'], axis=1)
+        
     return results_history
 
 
@@ -80,11 +122,11 @@ def prep_current_ratings_for_dash(
         tracker: Tracker,
         results_history: pd.DataFrame,
         min_games: int = 0,
+        event: str = None
 ) -> pd.DataFrame:
     current_ratings = tracker.get_current_ratings()
     current_ratings["rating"] = current_ratings["rating"].round(2)
     win_df = get_wins_from_history(results_history)
-    print(win_df)
     current_ratings = (
         remove_dummy_player(df=current_ratings)
         .merge(win_df, on="player_id", how="left")
@@ -97,27 +139,26 @@ def prep_current_ratings_for_dash(
             "rating": "Elo Rating",
         })
     )
-
     # only include players who have played min_games, then re-rank
     current_ratings = current_ratings[current_ratings["Games Played"] >= min_games]
     current_ratings["Rank"] = range(1, current_ratings.shape[0] + 1)
-
-    col_order = ["Rank", "Name", "Games Played", "Wins", "Elo Rating"]
+    current_ratings['Win Percentage'] = current_ratings['Wins'] / current_ratings['Games Played'] * 100
+    current_ratings['Event'] = event
+    col_order = ["Rank", "Name", "Games Played", "Wins", "Win Percentage", "Elo Rating", "Event"]
     return current_ratings[col_order]
 
 
-def get_wins_from_history(results_history: pd.DataFrame) -> pd.DataFrame():
-    cut_out = pd.concat([results_history['Winner1'], results_history['Winner2']]);
-    cut_seri = pd.Series(cut_out,name='Winner1');
-    cut_frame= cut_seri.to_frame()
-    return (
-        pd.DataFrame(cut_frame["Winner1"].value_counts())
-        .reset_index()
-        .rename(columns={
-            "index": "player_id",
-            "Winner1": "n_wins",
-        })
-    )
+def get_wins_from_history(data: pd.DataFrame) -> pd.DataFrame():
+    if isinstance(data.winners.values[0], str):
+        return pd.DataFrame(
+        pd.Series([x for x in data.winners], 
+                  name='Winner').to_frame().Winner.value_counts()).reset_index().rename(
+        columns={'index':'player_id', 'Winner': 'n_wins'})
+    else:
+        return pd.DataFrame(
+            pd.Series(list(sum([x for x in data.winners], ())), 
+                      name='Winner').to_frame().Winner.value_counts()).reset_index().rename(
+            columns={'index':'player_id', 'Winner': 'n_wins'})
 
 
 def plot_tracker_history(
@@ -141,20 +182,21 @@ def plot_tracker_history(
     history_df = remove_dummy_player(df=history_df)
 
     # filter out players who haven't played min_games
-    include_players = [player.id for player in tracker.player_df["player"]
+    include_players = [player.id for player in tracker.players
                        if player.count_games() >= min_games]
     history_df = history_df[history_df["player_id"].isin(include_players)]
 
     if equal_time_steps:
         date_df = history_df[["date"]].drop_duplicates().sort_values("date").reset_index(drop=True)
         date_df["game number"] = date_df.index + 1
-        history_df = history_df.merge(date_df, on="date", how="inner")
+        history_df = history_df.merge(date_df, on="Date", how="inner")
         x_col = "game number"
     else:
         x_col = "date"
 
     history_df = history_df.sort_values(["player_id", x_col]).reset_index(drop=True)
 
+    # return history_df
     fig = px.line(
         history_df,
         x=x_col,
