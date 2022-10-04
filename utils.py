@@ -3,16 +3,13 @@ import pandas as pd
 import numpy as np
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from multiBatelo.multielo import MultiElo
-from multiBatelo.player_tracker import Tracker
+from multielo.multielo import MultiElo
+from multielo.player_tracker import Tracker, Player
 from plotly.graph_objs import Figure
 from typing import List, Union
-
 import gspread
-
 from gspread.spreadsheet import Spreadsheet
 from gspread.worksheet import Worksheet
-
 import config
 
 
