@@ -203,6 +203,9 @@ def plot_tracker_history(
     )
     fig.update_traces(mode="lines+markers")
     fig.update_layout(
+        plot_bgcolor="#323130",
+        paper_bgcolor="#323130",
+        font_color="white",
         yaxis_title="Elo rating",
         title=title,
         title_x=0.5,
@@ -221,7 +224,6 @@ def plot_tracker_history(
         )]
     )
     return fig
-
 
 def display_current_ratings_table(
     current_ratings: pd.DataFrame,
