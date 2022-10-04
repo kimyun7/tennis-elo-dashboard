@@ -111,7 +111,13 @@ app.layout = html.Div(
                 html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
-                        dbc.Col(id="elo-ranking-table"),
+                        dbc.Card(
+                            html.Div(
+                                dbc.Col(id="elo-ranking-table"),
+                                style={"maxHeight": "600px", "overflow": "scroll"},
+                            ),
+                            body=True,
+                        ),
                         dcc.Graph(id="elo-ranking-chart"),
                     ]
                     ),
@@ -126,6 +132,7 @@ app.layout = html.Div(
     [Input("match-type-filter", "value"),
         Input("event-type-filter", "value"),])
 def get_rating_chart(match_type, event):
+    
     # Get updated data on callback
     match_data = utils.load_match_data_from_gsheet()
     player_df = utils.load_player_data_from_gsheet()
