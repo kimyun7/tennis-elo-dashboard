@@ -19,20 +19,20 @@ def get_dash_theme(style: str) -> List[str]:
     except AttributeError:
         raise AttributeError(f"could not find theme named '{style}'")
 
-def load_match_data_from_gsheet() -> pd.DataFrame:
+def load_match_data_from_gsheet(group: str) -> pd.DataFrame:
     gc = gspread.service_account(filename=config.GSHEETS_CREDENTIALS_FILE)
-    spreadsheet = gc.open_by_key(config.SPREADSHEET_ID)
-    data_sheet = get_worksheet_by_id(spreadsheet, config.DATA_SHEET_ID)
+    spreadsheet = gc.open_by_key(config.GROUPS[group]['SPREADSHEET_ID'])
+    data_sheet = get_worksheet_by_id(spreadsheet, config.GROUPS[group]['DATA_SHEET_ID'])
     df = worksheet_to_dataframe(data_sheet)
     df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")
     # df.rename(columns={'date':'Date'}, inplace=True)
     df.sort_values("date", inplace=True)
     return df
 
-def load_player_data_from_gsheet():
+def load_player_data_from_gsheet(group: str):
     gc = gspread.service_account(filename=config.GSHEETS_CREDENTIALS_FILE)
-    spreadsheet = gc.open_by_key(config.SPREADSHEET_ID)
-    data_sheet = get_worksheet_by_id(spreadsheet, config.PLAYER_SHEET_ID)
+    spreadsheet = gc.open_by_key(config.GROUPS[group]['SPREADSHEET_ID'])
+    data_sheet = get_worksheet_by_id(spreadsheet, config.GROUPS[group]['PLAYER_SHEET_ID'])
     df = worksheet_to_dataframe(data_sheet)
     return df
 

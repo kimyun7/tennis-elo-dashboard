@@ -32,8 +32,8 @@ app_color = {"graph_bg": "#082255", "graph_line": "#007ACE"}
 app.config["suppress_callback_exceptions"] = True
 
 # Get data
-match_data = utils.load_match_data_from_gsheet()
-player_df = utils.load_player_data_from_gsheet()
+match_data = utils.load_match_data_from_gsheet(group="AOULLIM")
+player_df = utils.load_player_data_from_gsheet(group="AOULLIM")
 
 app.layout = html.Div(
     children=[
@@ -61,9 +61,10 @@ app.layout = html.Div(
                                     dcc.Dropdown(
                                         id="group-filter",
                                         options=[
-                                            {"label": 'Aoullim', "value": 'Aoullim'},
+                                            {"label": 'Aoullim', "value": 'AOULLIM'},
+                                            {"label": 'iGo', "value": 'IGO'},
                                         ],
-                                        value="Aoullim",
+                                        value="AOULLIM",
                                         placeholder="Select tennis group",
                                         style={"border": "0px solid black"},
                                 )
@@ -130,12 +131,13 @@ app.layout = html.Div(
     [Output("elo-ranking-chart", "figure"),
      Output("elo-ranking-table", "children"),],
     [Input("match-type-filter", "value"),
-        Input("event-type-filter", "value"),])
-def get_rating_chart(match_type, event):
+        Input("event-type-filter", "value"),
+        Input("group-filter", "value")])
+def get_rating_chart(match_type, event, group):
     
     # Get updated data on callback
-    match_data = utils.load_match_data_from_gsheet()
-    player_df = utils.load_player_data_from_gsheet()
+    match_data = utils.load_match_data_from_gsheet(group)
+    player_df = utils.load_player_data_from_gsheet(group)
     players = [Player(player_id=x, rating=float(y)) for x,y in zip(player_df.player_id, player_df.initial_elo)]
     data = utils.prep_results_history_for_dash(match_data, event=event, match_type=match_type)
     data = data[['date','winners', 'losers']]

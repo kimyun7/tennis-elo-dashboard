@@ -6,9 +6,24 @@ INITIAL_RATING = 1000
 
 # Google Sheets info for reading input data
 GSHEETS_CREDENTIALS_FILE = "./google-credentials.json"
-SPREADSHEET_ID = "1oZ1M3ckCDxYGEQvPk8_Fe9aAGllc8LBvzL6Kc-wP2ik"
-DATA_SHEET_ID = 0
-PLAYER_SHEET_ID = 1739759371
+
+GROUPS = {
+    "AOULLIM" :{
+    "SPREADSHEET_ID": "1oZ1M3ckCDxYGEQvPk8_Fe9aAGllc8LBvzL6Kc-wP2ik",
+    "DATA_SHEET_ID": 0,
+    "PLAYER_SHEET_ID": 1739759371,
+    },
+    "IGO" : {
+    "SPREADSHEET_ID": "1P_o9kB0F4-FN4O3b3RSvKC4c1jSVlKx4svJuxck4wRw",
+    "DATA_SHEET_ID": 0,
+    "PLAYER_SHEET_ID": 437467283,
+    } 
+}
+
+
+# SPREADSHEET_ID = "1oZ1M3ckCDxYGEQvPk8_Fe9aAGllc8LBvzL6Kc-wP2ik"
+# DATA_SHEET_ID = 0
+# PLAYER_SHEET_ID = 1739759371
 DUMMY_PLAYER_NAME = "_Sub_"
 
 # dashboard settings
