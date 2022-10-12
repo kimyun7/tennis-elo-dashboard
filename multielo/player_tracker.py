@@ -4,11 +4,10 @@ from typing import Union, List, Tuple
 import logging
 import warnings
 import pickle
-
+from config import DEFAULT_INITIAL_RATING
 from multielo.multielo import MultiElo
 
 
-DEFAULT_INITIAL_RATING = 1000
 
 logger = logging.getLogger("multielo.player_tracker")
 warnings.simplefilter("once", DeprecationWarning)

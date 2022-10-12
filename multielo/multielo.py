@@ -1,16 +1,10 @@
 import numpy as np
 from typing import Union, List, Callable
 import logging
-
+from config import DEFAULT_K_VALUE, DEFAULT_D_VALUE, DEFAULT_SCORING_FUNCTION_BASE
 from multielo.score_functions import create_exponential_score_function
 
-
-DEFAULT_K_VALUE = 32
-DEFAULT_D_VALUE = 400
-DEFAULT_SCORING_FUNCTION_BASE = 1
-
 logger = logging.getLogger("multielo.multielo")
-
 
 class MultiElo:
     """

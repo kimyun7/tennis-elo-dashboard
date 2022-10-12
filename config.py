@@ -1,8 +1,8 @@
 # parameters for the Elo algorithm -- setting kind of arbitrarily for now, should tune once we have more data
-DEFAULT_K_VALUE = 16
+DEFAULT_K_VALUE = 8
 DEFAULT_D_VALUE = 400
 DEFAULT_SCORING_FUNCTION_BASE = 1.25
-INITIAL_RATING = 1000
+DEFAULT_INITIAL_RATING = 1000
 
 # Google Sheets info for reading input data
 GSHEETS_CREDENTIALS_FILE = "./google-credentials.json"
