@@ -138,6 +138,12 @@ def get_rating_chart(match_type, event, group):
     # Get updated data on callback
     match_data = utils.load_match_data_from_gsheet(group)
     player_df = utils.load_player_data_from_gsheet(group)
+    
+    if match_type == 'S':
+        player_df['initial_elo'] = player_df.initial_elo_singles
+    elif match_type == 'D':
+        player_df['initial_elo'] = player_df.initial_elo_doubles
+        
     players = [Player(player_id=x, rating=float(y)) for x,y in zip(player_df.player_id, player_df.initial_elo)]
     data = utils.prep_results_history_for_dash(match_data, event=event, match_type=match_type)
     data = data[['date','winners', 'losers']]
