@@ -1,6 +1,6 @@
 # parameters for the Elo algorithm -- setting kind of arbitrarily for now, should tune once we have more data
 DEFAULT_K_VALUE = 8
-DEFAULT_D_VALUE = 400
+DEFAULT_D_VALUE = 600
 DEFAULT_SCORING_FUNCTION_BASE = 1.25
 DEFAULT_INITIAL_RATING = 1000
 
