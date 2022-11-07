@@ -10,7 +10,7 @@ from typing import List
 import pandas as pd
 from multielo.multielo import MultiElo
 from multielo.player_tracker import Tracker, Player
-
+import re
 import argparse
 
 # determine if the script was run with any arguments
@@ -134,9 +134,9 @@ app.layout = html.Div(
         Input("event-type-filter", "value"),
         Input("group-filter", "value")])
 def get_rating_chart(match_type, event, group):
-    match_type = re.sub("^\s+|\s+$", "", match_type, flags=re.UNICODE)
-    event = re.sub("^\s+|\s+$", "", event, flags=re.UNICODE)
-    group = re.sub("^\s+|\s+$", "", group, flags=re.UNICODE)    
+    match_type = re.sub(r"^\s+|\s+$", "", match_type, flags=re.UNICODE)
+    event = re.sub(r"^\s+|\s+$", "", event, flags=re.UNICODE)
+    group = re.sub(r"^\s+|\s+$", "", group, flags=re.UNICODE)    
     
     # Get updated data on callback
     match_data = utils.load_match_data_from_gsheet(group)
