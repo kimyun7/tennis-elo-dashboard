@@ -134,6 +134,9 @@ app.layout = html.Div(
         Input("event-type-filter", "value"),
         Input("group-filter", "value")])
 def get_rating_chart(match_type, event, group):
+    match_type = re.sub("^\s+|\s+$", "", match_type, flags=re.UNICODE)
+    event = re.sub("^\s+|\s+$", "", event, flags=re.UNICODE)
+    group = re.sub("^\s+|\s+$", "", group, flags=re.UNICODE)    
     
     # Get updated data on callback
     match_data = utils.load_match_data_from_gsheet(group)
@@ -144,7 +147,8 @@ def get_rating_chart(match_type, event, group):
     elif match_type == 'D':
         player_df['initial_elo'] = player_df.initial_elo_doubles
         
-    players = [Player(player_id=x, rating=float(y)) for x,y in zip(player_df.player_id, player_df.initial_elo)]
+    players = [Player(player_id=x, rating=float(y)) for x,y in zip(player_df.player_id.str.replace(' ',''),
+                                                                   player_df.initial_elo)]
     data = utils.prep_results_history_for_dash(match_data, event=event, match_type=match_type)
     data = data[['date','winners', 'losers']]
     
